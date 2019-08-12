@@ -1,0 +1,5 @@
+./Images/output/box_0011.jpg 5,78,32,100,0
+./Images/output/box_0011.jpg 16,150,37,176,0
+./Images/output/box_0011.jpg 188,167,215,195,0
+./Images/output/box_0011.jpg 170,242,201,269,0
+./Images/output/box_0011.jpg 142,3,166,20,0

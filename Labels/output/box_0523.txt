@@ -1,0 +1,4 @@
+./Images/output/box_0523.jpg 235,65,262,89,0
+./Images/output/box_0523.jpg 407,109,434,133,0
+./Images/output/box_0523.jpg 384,316,411,347,0
+./Images/output/box_0523.jpg 189,298,218,325,0

@@ -1,0 +1,9 @@
+./Images/output/box_0354.jpg 313,39,346,74,0
+./Images/output/box_0354.jpg 312,106,346,140,0
+./Images/output/box_0354.jpg 318,170,354,208,0
+./Images/output/box_0354.jpg 418,202,454,240,0
+./Images/output/box_0354.jpg 430,116,466,149,0
+./Images/output/box_0354.jpg 427,38,460,74,0
+./Images/output/box_0354.jpg 522,33,558,65,0
+./Images/output/box_0354.jpg 523,103,565,135,0
+./Images/output/box_0354.jpg 523,174,561,207,0

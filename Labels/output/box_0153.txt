@@ -1,0 +1,7 @@
+./Images/output/box_0153.jpg 5,55,32,77,0
+./Images/output/box_0153.jpg 21,138,43,165,0
+./Images/output/box_0153.jpg 211,169,243,193,0
+./Images/output/box_0153.jpg 201,258,226,286,0
+./Images/output/box_0153.jpg 341,64,364,85,0
+./Images/output/box_0153.jpg 322,140,347,171,0
+./Images/output/box_0153.jpg 143,3,171,20,0

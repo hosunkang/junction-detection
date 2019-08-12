@@ -1,0 +1,7 @@
+./Images/output/box_0154.jpg 53,4,76,22,0
+./Images/output/box_0154.jpg 160,37,181,57,0
+./Images/output/box_0154.jpg 159,71,178,88,0
+./Images/output/box_0154.jpg 112,122,135,140,0
+./Images/output/box_0154.jpg 112,144,137,165,0
+./Images/output/box_0154.jpg 4,69,24,87,0
+./Images/output/box_0154.jpg 7,98,34,119,0

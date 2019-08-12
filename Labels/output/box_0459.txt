@@ -1,0 +1,7 @@
+./Images/output/box_0459.jpg 257,169,294,203,0
+./Images/output/box_0459.jpg 260,317,298,354,0
+./Images/output/box_0459.jpg 108,257,138,292,0
+./Images/output/box_0459.jpg 102,142,129,173,0
+./Images/output/box_0459.jpg 285,127,323,148,0
+./Images/output/box_0459.jpg 425,134,468,170,0
+./Images/output/box_0459.jpg 432,230,464,264,0

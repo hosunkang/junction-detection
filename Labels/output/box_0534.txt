@@ -1,0 +1,7 @@
+./Images/output/box_0534.jpg 338,111,376,142,0
+./Images/output/box_0534.jpg 263,132,294,163,0
+./Images/output/box_0534.jpg 275,305,302,339,0
+./Images/output/box_0534.jpg 339,273,379,310,0
+./Images/output/box_0534.jpg 202,233,234,268,0
+./Images/output/box_0534.jpg 181,75,220,115,0
+./Images/output/box_0534.jpg 255,69,299,101,0

@@ -1,0 +1,6 @@
+./Images/output/box_0426.jpg 350,164,368,183,0
+./Images/output/box_0426.jpg 338,181,355,202,0
+./Images/output/box_0426.jpg 393,206,411,222,0
+./Images/output/box_0426.jpg 373,219,390,237,0
+./Images/output/box_0426.jpg 477,119,494,135,0
+./Images/output/box_0426.jpg 433,78,450,98,0

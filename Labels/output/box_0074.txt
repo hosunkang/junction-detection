@@ -1,0 +1,6 @@
+./Images/output/box_0074.jpg 157,7,184,30,0
+./Images/output/box_0074.jpg 246,161,270,186,0
+./Images/output/box_0074.jpg 235,193,266,214,0
+./Images/output/box_0074.jpg 66,238,93,267,0
+./Images/output/box_0074.jpg 80,264,109,278,0
+./Images/output/box_0074.jpg 1,62,26,89,0

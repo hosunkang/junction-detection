@@ -1,0 +1,9 @@
+./Images/output/box_0262.jpg 336,89,374,117,0
+./Images/output/box_0262.jpg 547,100,581,130,0
+./Images/output/box_0262.jpg 572,196,623,228,0
+./Images/output/box_0262.jpg 555,280,590,309,0
+./Images/output/box_0262.jpg 293,171,338,202,0
+./Images/output/box_0262.jpg 307,252,340,292,0
+./Images/output/box_0262.jpg 90,230,128,262,0
+./Images/output/box_0262.jpg 75,147,110,178,0
+./Images/output/box_0262.jpg 161,82,200,110,0

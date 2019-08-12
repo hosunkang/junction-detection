@@ -1,0 +1,10 @@
+./Images/output/box_0212.jpg 345,161,367,180,0
+./Images/output/box_0212.jpg 167,131,192,148,0
+./Images/output/box_0212.jpg 169,208,196,229,0
+./Images/output/box_0212.jpg 174,274,195,290,0
+./Images/output/box_0212.jpg 338,237,359,259,0
+./Images/output/box_0212.jpg 334,312,350,330,0
+./Images/output/box_0212.jpg 373,238,388,259,0
+./Images/output/box_0212.jpg 381,185,395,203,0
+./Images/output/box_0212.jpg 379,119,401,141,0
+./Images/output/box_0212.jpg 240,99,262,118,0

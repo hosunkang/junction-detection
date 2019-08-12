@@ -1,0 +1,6 @@
+./Images/output/box_0181.jpg 46,3,69,18,0
+./Images/output/box_0181.jpg 23,82,48,102,0
+./Images/output/box_0181.jpg 16,163,41,181,0
+./Images/output/box_0181.jpg 238,182,261,201,0
+./Images/output/box_0181.jpg 269,106,282,130,0
+./Images/output/box_0181.jpg 227,24,249,44,0
