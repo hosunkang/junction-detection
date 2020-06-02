@@ -15,3 +15,7 @@ pyzed, keras, opencv, matplotlib, pillow, numpy, os, tensorflow
 3. Make train.txt file : `python make_train.txt.py`
 4. Train : `python train.py`
 5. Evaluation : `python yolo.py` or `python yolo_video.py`
+
+
+## DATASETS
+-My Box datasets : https://1drv.ms/u/s!AqpCZ5MtUogGg9IkOYe770EHf3s-nw?e=yQ1Qja
