@@ -20,21 +20,25 @@ from keras.utils import multi_gpu_model
 
 import tensorflow as tf
 from keras.backend.tensorflow_backend import set_session
-config = tf.ConfigProto()
-config.gpu_options.per_process_gpu_memory_fraction = 0.7
-set_session(tf.Session(config=config))
 
 import cv2
 import pyzed.sl as sl
 import copy as cp
+import math
+import matplotlib.pyplot as plt
+
+config = tf.ConfigProto()
+config.gpu_options.per_process_gpu_memory_fraction = 0.8
+set_session(tf.Session(config=config))
+
 
 class YOLO(object):
     _defaults = {
-        "model_path": 'logs/000/trained_weights_final.h5',
+        "model_path": 'logs/4000.h5',
         "anchors_path": 'model_data/my_anchors.txt',
         "classes_path": 'model_data/my_classes.txt',
         "score" : 0.3,
-        "iou" : 0.45,
+        "iou" : 0.5,
         "model_image_size" : (416, 416),
         "gpu_num" : 1,
     }
@@ -53,6 +57,8 @@ class YOLO(object):
         self.anchors = self._get_anchors()
         self.sess = K.get_session()
         self.boxes, self.scores, self.classes = self.generate()
+        self.baseline = 120 #ZED mini = 63, zed = 120
+        self.focal = 1400
 
     def _get_class(self):
         classes_path = os.path.expanduser(self.classes_path)
@@ -109,9 +115,12 @@ class YOLO(object):
                 score_threshold=self.score, iou_threshold=self.iou)
         return boxes, scores, classes
 
-    def detect_image(self, image):
+    def detect_image(self, image, image_right):
         start = timer()
-
+        if not image_right == None:
+            r_in_junction, r_out_junctions = self.detect_image_right(image_right)
+        width , height = image.size
+        
         if self.model_image_size != (None, None):
             assert self.model_image_size[0]%32 == 0, 'Multiples of 32 required'
             assert self.model_image_size[1]%32 == 0, 'Multiples of 32 required'
@@ -122,7 +131,6 @@ class YOLO(object):
             boxed_image = letterbox_image(image, new_image_size)
         image_data = np.array(boxed_image, dtype='float32')
 
-        # print(image_data.shape)
         image_data /= 255.
         image_data = np.expand_dims(image_data, 0)  # Add batch dimension.
 
@@ -134,104 +142,223 @@ class YOLO(object):
                 K.learning_phase(): 0
             })
 
-        # print('Found {} boxes for {}'.format(len(out_boxes), 'img'))
-
         font = ImageFont.truetype(font='font/FiraMono-Medium.otf',
-                    size=np.floor(3e-2 * image.size[1] + 0.5).astype('int32'))
+                    size=np.floor(5e-2 * image.size[1] + 0.5).astype('int32'))
         thickness = (image.size[0] + image.size[1]) // 300
+
+        out_junctions = []
+        in_junction = []
+        angles = []
 
         for i, c in reversed(list(enumerate(out_classes))):
             predicted_class = self.class_names[c]
             box = out_boxes[i]
             score = out_scores[i]
 
-            label = '{} {:.2f}'.format(predicted_class, score)
+            top, left, bottom, right = box  # Information of each boxes
+            top = max(0, np.floor(top + 0.5).astype('int32'))
+            left = max(0, np.floor(left + 0.5).astype('int32'))
+            bottom = min(image.size[1], np.floor(bottom + 0.5).astype('int32'))
+            right = min(image.size[0], np.floor(right + 0.5).astype('int32'))
+
+            if predicted_class == "in_junc":
+                in_center_x = (left + right ) // 2
+                in_center_y = (top + bottom ) // 2
+                in_junction.append(in_center_x)
+                in_junction.append(in_center_y)
+                area = (left, top, right, bottom)
+                ROI = image.crop(area)
+                angles = self.detect_line(ROI)
+                # print(int(math.degrees(angles[0])), int(math.degrees(angles[1])), int(math.degrees(angles[2])))
+                
+
+            elif predicted_class == "out_junc":
+                center_x = (left + right ) // 2
+                center_y = (top + bottom ) // 2
+                out_junctions.append([center_x,center_y])
+            # else: ## box
+            #     area = (left, top, right, bottom)
+            #     ROI = image.crop(area)
+            #     self.test(ROI)
+            #     # for i in range(thickness):
+            #     #     draw.rectangle([left + i, top + i, right - i, bottom - i], outline=self.colors[c])
+
+        ##### Draw the box size line
+        draw = ImageDraw.Draw(image)
+        good_out_junc = []
+        if in_junction != [] and out_junctions != []:
+            r = 20
+            draw.ellipse((in_junction[0]-r, in_junction[1]-r, in_junction[0]+r, in_junction[1]+r),(0,255,0), (0,255,0))
+            if r_in_junction != []:
+                in_disparity = in_junction[0] - r_in_junction[0]
+                in_x = self.baseline * (in_junction[0]-width//2) / in_disparity
+                in_y = self.baseline * (in_junction[1]-height//2) / in_disparity
+                in_z = self.baseline * self.focal / in_disparity
+                p1 = [in_x,in_y,in_z]
+
+            if len(out_junctions) == 6:
+                for angle in angles:
+                    min_angle_gap = 360
+                    min_angle = [0,0]
+                    for out_junction in out_junctions: 
+                        temp_angle = self.get_angle(in_junction[0], in_junction[1], out_junction[0], out_junction[1]) + 180
+                        if abs(temp_angle - math.degrees(angle)) < min_angle_gap:
+                            min_angle_gap = abs(temp_angle - math.degrees(angle))
+                            min_angle = out_junction      
+                    draw.line((in_junction[0], in_junction[1], min_angle[0], min_angle[1]), (0,255,0), 10)
+                
+                    if r_out_junctions != []:
+                        min_dis = 100000
+                        min_r_junc = [0,0]
+                        for r_out_junction in r_out_junctions:
+                            if abs(r_out_junction[1] - min_angle[1]) < 50:
+                                temp_dis = self.euclidean_distance2(min_angle, r_out_junction)
+                                if temp_dis < min_dis:
+                                    min_dis = temp_dis
+                                    min_r_junc = r_out_junction
+                            
+                        disparity = min_angle[0] - min_r_junc[0]
+                        out_x = self.baseline * (min_angle[0]-width//2) / disparity
+                        out_y = self.baseline * (min_angle[1]-height//2) / disparity
+                        out_z = self.baseline * self.focal / disparity
+                        p2 = [out_x,out_y,out_z]
+
+                        if p1 != [] and p2 != []:
+                            distance = self.euclidean_distance3(p1,p2)
+                            
+                            text_distance = "%.2f mm"%(distance)
+                            draw.text((min_angle[0]+10, min_angle[1]-10), text_distance, fill=(0, 0, 255), font=font)
+                            draw.ellipse((min_angle[0]-r, min_angle[1]-r, min_angle[0]+r, min_angle[1]+r),(255,0,0), (255,0,0))
+        del draw
+        end = timer()
+        return image
+
+    def detect_image_right(self, image):
+        width , height = image.size
+
+        if self.model_image_size != (None, None):
+            assert self.model_image_size[0]%32 == 0, 'Multiples of 32 required'
+            assert self.model_image_size[1]%32 == 0, 'Multiples of 32 required'
+            boxed_image = letterbox_image(image, tuple(reversed(self.model_image_size)))
+        else:
+            new_image_size = (image.width - (image.width % 32),
+                              image.height - (image.height % 32))
+            boxed_image = letterbox_image(image, new_image_size)
+        image_data = np.array(boxed_image, dtype='float32')
+
+        image_data /= 255.
+        image_data = np.expand_dims(image_data, 0)  # Add batch dimension.
+
+        out_boxes, out_scores, out_classes = self.sess.run(
+            [self.boxes, self.scores, self.classes],
+            feed_dict={
+                self.yolo_model.input: image_data,
+                self.input_image_shape: [image.size[1], image.size[0]],
+                K.learning_phase(): 0
+            })
+
+        temp_in_junction = []
+        temp_out_junctions = []
+
+        for i, c in reversed(list(enumerate(out_classes))):
+            predicted_class = self.class_names[c]
+            box = out_boxes[i]
+            score = out_scores[i]
+
             draw = ImageDraw.Draw(image)
-            label_size = draw.textsize(label, font)
 
             top, left, bottom, right = box  # Information of each boxes
             top = max(0, np.floor(top + 0.5).astype('int32'))
             left = max(0, np.floor(left + 0.5).astype('int32'))
             bottom = min(image.size[1], np.floor(bottom + 0.5).astype('int32'))
             right = min(image.size[0], np.floor(right + 0.5).astype('int32'))
-            #print(label, (left, top), (right, bottom))
-
-            if top - label_size[1] >= 0:
-                text_origin = np.array([left, top - label_size[1]])
-            else:
-                text_origin = np.array([left, top + 1])
-
-            # add code : crop image and find junction
         
-            # crop_image = image.crop([left, top, right, bottom])
-            # arr_crop_image = np.array(crop_image)
-            # find_corners(arr_crop_image)
-            # My kingdom for a good redistributable image drawing library.
-            for i in range(thickness):
-                draw.rectangle(
-                    [left + i, top + i, right - i, bottom - i],
-                    outline=self.colors[c])
-            draw.rectangle(
-                [tuple(text_origin), tuple(text_origin + label_size)],
-                fill=self.colors[c])
-            draw.text(text_origin, label, fill=(0, 0, 0), font=font)
-            del draw
-        end = timer()
-        #print(end - start)
-        #cv2.destroyAllWindows()
-        return image
+            if predicted_class == "in_junc":
+                in_center_x = (left + right ) // 2
+                in_center_y = (top + bottom ) // 2
+                temp_in_junction.append(in_center_x)
+                temp_in_junction.append(in_center_y)
 
+            elif predicted_class == "out_junc":
+                center_x = (left + right ) // 2
+                center_y = (top + bottom ) // 2
+                temp_out_junctions.append([center_x, center_y])
+
+        return temp_in_junction, temp_out_junctions
+
+    def detect_line(self, img_ori):
+        img = np.asarray(img_ori)
+        gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+        edge = cv2.Canny(gray, 10,40, L2gradient = True)
+        k = cv2.getStructuringElement(cv2.MORPH_RECT, (7,7))
+        result = cv2.dilate(edge, k)
+        # cv2.imshow('ddd', result)
+        h, w  = result.shape[:2]
+        result2 = cv2.morphologyEx(result, cv2.MORPH_OPEN, k)
+        result_for_cen = cv2.erode(result2,k)
+        h_for_cen, w_for_cen = result_for_cen.shape[:2]
+        mindis = h_for_cen+w_for_cen
+        temp = 0
+        cen_x = w_for_cen // 2
+        cen_y = h_for_cen // 2
+        for i in range(h_for_cen):
+            for j in range(w_for_cen):
+                if result_for_cen[i,j] == 255:
+                    temp = self.get_distance(w_for_cen//2, h_for_cen//2, j, i)
+                    if temp < mindis:
+                        mindis = temp
+                        cen_x, cen_y = j, i
+        angles = []
+        for i in range(h):
+            for j in range(w):
+                if result[i,j] == 255:
+                    angles.append(self.get_angle(cen_x, cen_y, j, i))
+        
+        degree_hist = []
+        for i in range(-179,181,1):
+            temp_hist = 0
+            for angle in angles:
+                if angle == i:
+                    temp_hist += 1
+            degree_hist.append(temp_hist)
+        
+
+        de0_119 = degree_hist[0:119]
+        de120_239 = degree_hist[120:239]
+        de240_359 = degree_hist[240:359]
+        degree1 = math.radians(np.argmax(de0_119))
+        degree2 = math.radians(np.argmax(de120_239)+120)
+        degree3 = math.radians(np.argmax(de240_359)+240)
+        degrees = []
+        degrees.append(degree1)
+        degrees.append(degree2)
+        degrees.append(degree3)
+        
+        # cv2.line(img, (cen_x, cen_y), (int(cen_x - 50*math.cos(degree1)), int(cen_y - 50*math.sin(degree1))),(0,255,0), 3)
+        # cv2.line(img, (cen_x, cen_y), (int(cen_x - 50*math.cos(degree2)), int(cen_y - 50*math.sin(degree2))),(0,255,0), 3)
+        # cv2.line(img, (cen_x, cen_y), (int(cen_x - 50*math.cos(degree3)), int(cen_y - 50*math.sin(degree3))),(0,255,0), 3)
+        #cv2.imshow('center_point', img)
+
+        return degrees
+    
     def close_session(self):
         self.sess.close()
-
-def find_corners(img):
-
-    img_dup = cp.copy(img)
-    img_dup1 = cp.copy(img)
-
-    harris = harris_corners(img)
-    shitomasi,silhouette = shi_tomasi(img_dup)
     
-    #Display different corner detection methods side by side
+    def euclidean_distance2(self, p1, p2):
+        temp_dis = math.sqrt(pow(abs(p1[0]-p2[0]),2) + pow(abs(p1[1]-p2[1]),2))
+        return temp_dis
+
+    def euclidean_distance3(self, p1, p2):
+        temp_dis = math.sqrt(pow(abs(p1[0]-p2[0]),2) + pow(abs(p1[1]-p2[1]),2)+ pow(abs(p1[2]-p2[2]),2))
+        return temp_dis
+
+    def get_distance(self, w_c, h_c, w ,h):
+        temp_dis = math.sqrt(pow(abs(w_c-w),2) + pow(abs(h_c-h),2))
+        return temp_dis
     
-    out1 = np.concatenate((harris,shitomasi),axis=1)
-    out2 = np.concatenate((img_dup1,silhouette),axis=1)
-
-    out3 = np.concatenate((out1,out2),axis=0)    
-    #cv2.imshow('Left: Harris, Right: Shi-Tomasi',out1)
-    #cv2.imshow('Important points',out2)
-    cv2.imshow('Corners',silhouette)
-    cv2.waitKey()
-
-def harris_corners(image):
-
-    gray_img = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
-    gray_img = np.float32(gray_img)
-
-    #You can play with these parameters to get different outputs
-    corners_img = cv2.cornerHarris(gray_img,3,3,0.04)
-
-    image[corners_img>0.001*corners_img.max()] = [255,255,0]
-
-    return image
-
-def shi_tomasi(image):
-
-    gray_img = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
-    
-    #You can play with these parameters to get different outputs 
-    corners_img = cv2.goodFeaturesToTrack(gray_img,1200,0.01,10)
-    #corners_img = np.int0(corners_img)
-
-    blank_img = np.zeros((image.shape[0],image.shape[1],3),np.uint8)
-
-    for corners in corners_img:
-
-        x,y = corners.ravel()
-        cv2.circle(image,(x,y),3,[255,255,0],-1)
-        cv2.circle(blank_img,(x,y),2,[255,255,0],-1)
-
-    return image,blank_img
+    def get_angle(self, w_c, h_c, w ,h):
+        temp_angle = int(math.degrees(math.atan2(h-h_c, w-w_c)))
+        return temp_angle
 
 def detect_video(yolo, video_path, output_path=""):
     if video_path == "webcam": #real time ZED camera 
@@ -247,11 +374,11 @@ def detect_video(yolo, video_path, output_path=""):
             exit()
         runtime = sl.RuntimeParameters()
         mat = sl.Mat()
+        mat_r = sl.Mat()
         isOutput = True if output_path != "" else False
         if isOutput:
             fourcc = cv2.VideoWriter_fourcc(*'DIVX')
             out = cv2.VideoWriter(output_path, fourcc, 25.0, (640,480))
-        #vid = cv2.VideoCapture(0)
     else:
         vid = cv2.VideoCapture(video_path)
         if not vid.isOpened():
@@ -275,10 +402,16 @@ def detect_video(yolo, video_path, output_path=""):
                 vid.retrieve_image(mat, sl.VIEW.VIEW_LEFT)
                 frame = mat.get_data()
                 image = Image.fromarray(frame)
+
+                vid.retrieve_image(mat_r, sl.VIEW.VIEW_RIGHT)
+                frame_r = mat_r.get_data()
+                image_r = Image.fromarray(frame_r)
+            else:
+                continue
         else:
             return_value, frame = vid.read()
             image = Image.fromarray(frame)
-        image = yolo.detect_image(image)
+        image= yolo.detect_image(image,image_r)
         result = np.asarray(image)
         curr_time = timer()
         exec_time = curr_time - prev_time

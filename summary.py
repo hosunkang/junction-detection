@@ -9,22 +9,17 @@ image_dir = current_dir + "/Images/output/"
 label_dir = current_dir + "/Labels/output/"
 
 # Create and/or truncate train.txt and test.txt
-file_train = open('train.txt', 'w')
+file_train = open('train2.txt', 'w')
 
 # Populate train.txt and test.txt
 for pathAndFilename in glob.iglob(os.path.join(label_dir, "*.txt")):
     f = open(pathAndFilename, 'r')
     lines = f.readlines()
     f.close()
-    if not lines == []:
-        line_length = list(range(len(lines)))
-        for line,i in zip(lines,line_length):
-            line = line.split(' ')
-            if i == 0:
-                file_train.write(line[0] + ' ')
-            line[1] = line[1].replace("\n", " ")
-            file_train.write(line[1])
-        file_train.write("\n")
-    else:
-        os.remove(pathAndFilename)
+    line_length = list(range(len(lines)))
+    for line in lines:
+        line = line.replace(' ',',')
+        temp = line.split(',')
+        if temp[5] != "0\n":
+            file_train.write(line)
 file_train.close()

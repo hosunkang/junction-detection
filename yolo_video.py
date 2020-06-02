@@ -1,19 +1,80 @@
 import sys
-import argparse
+import argparse, cv2, glob, os
+import numpy as np
 from yolo import YOLO, detect_video
 from PIL import Image
 
 def detect_img(yolo):
-    while True:
-        img = input('Input image filename:')
-        try:
-            image = Image.open(img)
-        except:
-            print('Open Error! Try again!')
-            continue
+    count = 1
+    img_l_dir = 'testimage/left/'
+    img_r_dir = 'testimage/right/'
+    img_ls = glob.glob(os.path.join(img_l_dir, '*.png'))
+    img_ls.sort()
+    img_rs = glob.glob(os.path.join(img_r_dir, '*.png'))
+    img_rs.sort()
+    
+    for idx, img_l in enumerate(img_ls):
+        if img_rs == []:
+            try:
+                image = Image.open(img_l)
+            except:
+                print('Open Error! Try again!')
+                continue
+            else:
+                r_image = yolo.detect_image(image, None)
+                r_image_np = np.asarray(r_image)
+                r_image_np = cv2.cvtColor(r_image_np, cv2.COLOR_RGB2BGR)
+                cv2.imwrite('result_{0}.png'.format(count), r_image_np)
+                count += 1
+                #r_image.show()    
         else:
-            r_image = yolo.detect_image(image)
-            r_image.show()
+            try:
+                image = Image.open(img_l)
+                image_right = Image.open(img_rs[idx])
+            except:
+                print('Open Error! Try again!')
+                continue
+            else:
+                r_image = yolo.detect_image(image,image_right)
+                r_image_np = np.asarray(r_image)
+                r_image_np = cv2.cvtColor(r_image_np, cv2.COLOR_RGB2BGR)
+                cv2.imwrite('result_{0}.png'.format(count), r_image_np)
+                count += 1
+                #r_image.show()   
+
+    # while True:
+    #     img_l = input('Input left image filename:')
+    #     if img_l == 'q':
+    #         break
+
+    #     img_r = input('Input right image filename:')
+    #     if img_r == None:
+    #         try:
+    #             image = Image.open(img_l)
+    #         except:
+    #             print('Open Error! Try again!')
+    #             continue
+    #         else:
+    #             r_image = yolo.detect_image(image, None)
+    #             r_image_np = np.asarray(r_image)
+    #             r_image_np = cv2.cvtColor(r_image_np, cv2.COLOR_RGB2BGR)
+    #             cv2.imwrite('result_{0}.png'.format(count), r_image_np)
+    #             count += 1
+    #             #r_image.show()    
+    #     else:
+    #         try:
+    #             image = Image.open(img_l)
+    #             image_right = Image.open(img_r)
+    #         except:
+    #             print('Open Error! Try again!')
+    #             continue
+    #         else:
+    #             r_image = yolo.detect_image(image,image_right)
+    #             r_image_np = np.asarray(r_image)
+    #             r_image_np = cv2.cvtColor(r_image_np, cv2.COLOR_RGB2BGR)
+    #             cv2.imwrite('result_{0}.png'.format(count), r_image_np)
+    #             count += 1
+    #             #r_image.show()   
     yolo.close_session()
 
 FLAGS = None

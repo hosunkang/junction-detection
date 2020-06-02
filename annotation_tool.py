@@ -25,7 +25,7 @@ SIZE = 256, 256
 classes = []
 
 try:
-    with open('model_data/my_classes.txt','r') as cls:
+    with open('./model_data/my_classes.txt','r') as cls:
         classes = cls.readlines()
     classes = [cls.strip() for cls in classes]
 except IOError as io:
@@ -160,6 +160,7 @@ class LabelTool():
         # get image list
         self.imageDir = os.path.join(r'./Images', '%s' %(self.category))
         self.imageList = glob.glob(os.path.join(self.imageDir, '*.jpg'))
+        self.imageList.sort()
         if len(self.imageList) == 0:
             print('No .jpg images found in the specified dir!')
             tkMessageBox.showerror("Error!", message = "No .jpg images found in the specified dir!")
