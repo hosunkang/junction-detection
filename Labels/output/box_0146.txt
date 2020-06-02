@@ -1,7 +1,0 @@
-./Images/output/box_0146.jpg 125,8,153,26,0
-./Images/output/box_0146.jpg 344,11,363,35,0
-./Images/output/box_0146.jpg 306,112,330,141,0
-./Images/output/box_0146.jpg 345,95,362,119,0
-./Images/output/box_0146.jpg 302,222,330,245,0
-./Images/output/box_0146.jpg 40,180,67,205,0
-./Images/output/box_0146.jpg 9,84,36,108,0

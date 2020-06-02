@@ -1,7 +1,0 @@
-./Images/output/box_0100.jpg 127,8,145,23,0
-./Images/output/box_0100.jpg 242,70,259,96,0
-./Images/output/box_0100.jpg 228,136,247,156,0
-./Images/output/box_0100.jpg 100,130,118,149,0
-./Images/output/box_0100.jpg 100,193,117,209,0
-./Images/output/box_0100.jpg 9,34,33,52,0
-./Images/output/box_0100.jpg 16,91,32,111,0

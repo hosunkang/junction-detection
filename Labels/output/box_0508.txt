@@ -1,4 +1,0 @@
-./Images/output/box_0508.jpg 351,125,389,161,0
-./Images/output/box_0508.jpg 275,257,321,287,0
-./Images/output/box_0508.jpg 418,313,468,354,0
-./Images/output/box_0508.jpg 498,199,536,228,0

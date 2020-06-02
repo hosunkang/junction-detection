@@ -1,6 +1,0 @@
-./Images/output/box_0521.jpg 217,91,254,115,0
-./Images/output/box_0521.jpg 272,98,301,129,0
-./Images/output/box_0521.jpg 257,304,299,336,0
-./Images/output/box_0521.jpg 305,285,345,318,0
-./Images/output/box_0521.jpg 133,317,174,350,0
-./Images/output/box_0521.jpg 101,136,137,167,0

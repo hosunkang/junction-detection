@@ -1,2 +1,0 @@
-./Images/output/box_0032.jpg 322,6,340,25,0
-./Images/output/box_0032.jpg 47,2,65,15,0

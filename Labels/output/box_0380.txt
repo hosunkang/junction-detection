@@ -1,7 +1,0 @@
-./Images/output/box_0380.jpg 288,128,329,161,0
-./Images/output/box_0380.jpg 326,175,356,201,0
-./Images/output/box_0380.jpg 291,257,320,289,0
-./Images/output/box_0380.jpg 323,295,356,332,0
-./Images/output/box_0380.jpg 429,246,476,281,0
-./Images/output/box_0380.jpg 462,125,496,166,0
-./Images/output/box_0380.jpg 419,84,455,119,0

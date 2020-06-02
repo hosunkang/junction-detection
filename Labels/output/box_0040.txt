@@ -1,7 +1,0 @@
-./Images/output/box_0040.jpg 78,10,105,27,0
-./Images/output/box_0040.jpg 222,48,242,72,0
-./Images/output/box_0040.jpg 218,93,239,113,0
-./Images/output/box_0040.jpg 152,159,179,183,0
-./Images/output/box_0040.jpg 156,194,180,217,0
-./Images/output/box_0040.jpg 17,135,42,158,0
-./Images/output/box_0040.jpg 7,95,28,122,0

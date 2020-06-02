@@ -1,6 +1,0 @@
-./Images/output/box_0483.jpg 168,18,194,42,0
-./Images/output/box_0483.jpg 334,81,366,109,0
-./Images/output/box_0483.jpg 383,31,415,65,0
-./Images/output/box_0483.jpg 359,180,393,209,0
-./Images/output/box_0483.jpg 323,223,355,260,0
-./Images/output/box_0483.jpg 193,165,231,202,0
