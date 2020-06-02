@@ -8,7 +8,6 @@
 ## REQUIREMENTS
 pyzed, keras, opencv, matplotlib, pillow, numpy, os, tensorflow
 
----
 ## USAGE
 1. Get your custom box images
 2. Make annotation files : `python annotation_tool.py`
