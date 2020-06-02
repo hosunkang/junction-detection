@@ -1,12 +1,9 @@
 # Junction detection Demo code
 ## REFERENCE
-<https://github.com/qqwweee/keras-yolo3>
-<https://github.com/hosunkang/segment_annotation_tool>
-<https://github.com/ManivannanMurugavel/Yolo-Annotation-Tool-New->
+1. <https://github.com/qqwweee/keras-yolo3>
+2. <https://github.com/hosunkang/segment_annotation_tool>
+3. <https://github.com/ManivannanMurugavel/Yolo-Annotation-Tool-New->
 
 ---
 
 ## USAGE
-
-
-
